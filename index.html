@@ -84,6 +84,36 @@
       opacity:.28;
     }
 
+    /* ✅ Bottom-center Main Menu (doesn't block anything except the button) */
+    .mainMenuDock{
+      position:fixed;
+      left:0; right:0;
+      bottom:10px;
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+      z-index:99999;
+    }
+    .mainMenuDock .menuBtn{
+      pointer-events:auto;
+      appearance:none;
+      border:1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.86);
+      border-radius:999px;
+      padding: 10px 14px;
+      font-weight:950;
+      cursor:pointer;
+      box-shadow: 0 10px 18px rgba(2,6,23,.14);
+      backdrop-filter: blur(10px);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      white-space:nowrap;
+      transition: transform .06s ease, box-shadow .18s ease;
+    }
+    .mainMenuDock .menuBtn:hover{ transform: translateY(-1px); box-shadow: 0 14px 24px rgba(2,6,23,.18); }
+    .mainMenuDock .menuBtn:active{ transform: translateY(0px); }
+
     /* Fit-to-viewport wrapper */
     .viewport{
       position:fixed; inset:0;
@@ -215,7 +245,6 @@
       max-width: 340px;
     }
 
-    /* Main content: left "bond + equation" and right step cards (2) */
     .mid{
       min-height:0;
       display:grid;
@@ -263,7 +292,7 @@
 
     .bondBox{
       width:100%;
-      height:190px; /* ✅ bigger bond */
+      height:190px;
       overflow:hidden;
       border-radius:14px;
       border:1px solid rgba(15,23,42,.06);
@@ -273,7 +302,6 @@
       justify-content:center;
     }
 
-    /* Equation chain:  A + B = 100 + remainder = final */
     .eqStrip{
       display:flex;
       align-items:center;
@@ -302,7 +330,6 @@
       overflow:hidden;
     }
 
-    /* Step cards (2) */
     .stepsCol{
       display:grid;
       grid-template-rows: 1fr 1fr;
@@ -398,7 +425,6 @@
     .okField{ border-color: rgba(22,163,74,.92)!important; box-shadow:0 0 0 4px rgba(22,163,74,.14)!important; }
     .badField{ border-color: rgba(220,38,38,.92)!important; box-shadow:0 0 0 4px rgba(220,38,38,.12)!important; }
 
-    /* ✅ Bigger bottom final blank */
     #finalText{
       width:92px;
       height:34px;
@@ -407,7 +433,6 @@
       line-height:34px;
     }
 
-    /* Rail */
     button{
       border:1px solid var(--line);
       background:#fff;
@@ -492,7 +517,6 @@
       user-select:none;
     }
 
-    /* Confetti */
     .confetti{
       position:fixed; inset:0;
       pointer-events:none;
@@ -510,7 +534,6 @@
       to{ transform: translateY(110vh) rotate(260deg); opacity:1; }
     }
 
-    /* Small/mobile */
     #panel.smallMode .layout{ grid-template-columns: 1fr; }
     #panel.smallMode .hint{ display:none; }
     #panel.smallMode .mid{ grid-template-columns: 1fr; }
@@ -558,7 +581,6 @@
                 <!-- LEFT: bond + equation + final -->
                 <div class="leftBoard">
                   <div class="bondRow">
-                    <!-- A node (no inputs) -->
                     <div class="bondBox" aria-label="first number">
                       <svg viewBox="0 0 320 190" width="100%" height="190" role="img" aria-label="First number node">
                         <defs>
@@ -580,7 +602,6 @@
 
                     <div class="plusBadge">+</div>
 
-                    <!-- B split into (to100) and remainder -->
                     <div class="bondBox" aria-label="number bond for second number">
                       <svg viewBox="0 0 320 190" width="100%" height="190" role="img" aria-label="Number bond B">
                         <defs>
@@ -628,7 +649,6 @@
                     </div>
                   </div>
 
-                  <!-- equation chain -->
                   <div class="eqStrip" aria-label="equation chain">
                     <span id="Aeq">97</span>
                     <span class="dim">+</span>
@@ -646,12 +666,10 @@
                     <span class="op" style="color:var(--muted);font-weight:900;">+</span>
                     <span id="Bfinal">47</span>
                     <span class="op" style="color:var(--muted);font-weight:900;">=</span>
-                    <!-- ✅ bottom final answer is now a blank -->
                     <input class="blank" id="finalText" inputmode="numeric" autocomplete="off" aria-label="final answer (bottom)"/>
                   </div>
                 </div>
 
-                <!-- RIGHT: step cards -->
                 <div class="stepsCol" aria-label="step cards">
                   <div class="stepCard orange">
                     <div class="stepTitle orange"><span class="label">STEP 1</span></div>
@@ -681,7 +699,6 @@
               </div>
             </div>
 
-            <!-- BUTTON RAIL -->
             <div class="rail" aria-label="controls">
               <div class="railTitle">
                 <span>Controls</span>
@@ -709,7 +726,6 @@
           <div class="confetti" id="confetti"></div>
         </div>
 
-        <!-- Hidden xAPI base -->
         <div id="xapiBase">
           <script src="xapiwrapper.min.js"></script>
           <script src="index.js"></script>
@@ -722,7 +738,11 @@
     </div>
   </div>
 
-  <!-- Sound kit (generic) -->
+  <!-- ✅ Bottom-center Main Menu button -->
+  <div class="mainMenuDock">
+    <button class="menuBtn" id="btnMainMenu" type="button" title="Back to Main Menu">🏠 Main Menu</button>
+  </div>
+
   <script>
     let audioCtx = null;
     function ensureAudio(){
@@ -745,35 +765,22 @@
 
   <script>
     const ACTIVITY_ID = "https://limkimsze-maker.github.io/Make100_First_Method2/";
+    const MAIN_MENU_URL = "https://limkimsze-maker.github.io/P3_Mental_Sum_Challenge/";
     const $ = (id)=>document.getElementById(id);
 
-    const state = {
-      A:97, B:47,
-      to100:3,
-      remain:44,
-      final:144
-    };
+    const state = { A:97, B:47, to100:3, remain:44, final:144 };
 
-    const fieldIds = [
-      "to100","remain","eq_rem","eq_final",
-      "s1_add","s1_ans",
-      "s2_rem","s2_ans",
-      "finalText"
-    ];
+    const fieldIds = ["to100","remain","eq_rem","eq_final","s1_add","s1_ans","s2_rem","s2_ans","finalText"];
 
     const revealPlan = [
       { id:"to100",  val:()=>state.to100, msg:()=>`Split ${state.B}: part to make 100.` },
       { id:"remain", val:()=>state.remain, msg:()=>`Remaining part after making 100.` },
-
       { id:"s1_add", val:()=>state.to100, msg:()=>`Step 1: add ${state.to100} to ${state.A}.` },
       { id:"s1_ans", val:()=>100,        msg:()=>`${state.A} + ${state.to100} = 100.` },
-
       { id:"s2_rem", val:()=>state.remain, msg:()=>`Step 2: add 100 to the remainder.` },
       { id:"s2_ans", val:()=>state.final,  msg:()=>`100 + ${state.remain} = ${state.final}.` },
-
       { id:"eq_rem",   val:()=>state.remain, msg:()=>`Equation: 100 + remainder.` },
       { id:"eq_final", val:()=>state.final,  msg:()=>`Final answer.` },
-
       { id:"finalText", val:()=>state.final, msg:()=>`Bottom answer: ${state.A} + ${state.B} = ${state.final}.` },
     ];
     let nextIndex = 0;
@@ -937,11 +944,10 @@
       state.A = A;
       state.B = B;
 
-      state.to100 = 100 - A;          // A is 91..99 so 1..9
-      state.remain = B - state.to100; // remainder after using part of B
+      state.to100 = 100 - A;
+      state.remain = B - state.to100;
       state.final = 100 + state.remain;
 
-      // ensure remainder non-negative (we generate B to guarantee this)
       updateTexts();
       clearBlanks();
       setStatus(false, "New question");
@@ -952,9 +958,9 @@
 
     function newQuestion(){
       const A = randInt(91, 99);
-      const to100 = 100 - A;               // 1..9
-      const minB = to100 + 10;             // ensure remainder >= 10 (looks nicer than 0..)
-      const B = randInt(minB, 99);         // keep 2-digit
+      const to100 = 100 - A;
+      const minB = to100 + 10;
+      const B = randInt(minB, 99);
       setProblem(A,B);
     }
 
@@ -1009,7 +1015,10 @@
     window.addEventListener("DOMContentLoaded", ()=>{
       lockScroll();
 
-      // ✅ Sound enabled by default (best possible: auto-resume on first interaction)
+      // ✅ Main Menu button
+      const btn = $("btnMainMenu");
+      if(btn) btn.addEventListener("click", ()=>{ window.location.href = MAIN_MENU_URL; });
+
       sessionStorage.setItem("UFCO-audio-unlocked","1");
       (function(){
         let armed = false;
@@ -1038,9 +1047,8 @@
       });
 
       scaleStage();
-      setProblem(97,47); // start with example
+      setProblem(97,47);
     });
   </script>
-  <script src="https://limkimsze-maker.github.io/assets/nav.js"></script>
 </body>
 </html>
